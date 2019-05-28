@@ -9,11 +9,12 @@ TIMESTAMP=201905251430.41
 #    Run ` enc.sh` and ` dec.sh X.tar.enc` -- i.e. with preceding space
 #    (https://unix.stackexchange.com/questions/10922/temporarily-suspend-bash-history-on-a-given-shell)
 
-# Any command-fail forces quit
+# quit on error
 set -e
 
-# assume this file is /tmp/vault/enc.sh
+# switch to folder of script
 cd $(dirname "$0")
+
 
 # force-create if not exist
 mkdir -p "$STORE_FOLDER"
@@ -29,7 +30,7 @@ cd ..
 
 # compress and delete original
 tar -c -z -f vault.tar "$parent_dir"/
-rm -fr "$parent_dir"
+rm -r "$parent_dir"
 
 # encrypt and delete compressed
 openssl \
@@ -49,8 +50,15 @@ touch -m -a -t "$TIMESTAMP" vault.raw
 
 mv vault.raw "$STORE_FOLDER"
 
-cd "$STORE_FOLDER"
+# cd "$STORE_FOLDER"
 
-# turn history back on
-#   https://unix.stackexchange.com/questions/10922/temporarily-suspend-bash-history-on-a-given-shell	
-set -o history
+# # turn history back on
+# #   https://unix.stackexchange.com/questions/10922/temporarily-suspend-bash-history-on-a-given-shell	
+# set -o history
+
+if [[ $1 != SETUP ]]; then
+    # When exiting, terminate the parent shell
+	trap 'kill -s HUP "$PPID"' EXIT
+fi
+
+# trap 'cd ..' EXIT
