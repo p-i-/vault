@@ -2,7 +2,6 @@
 
 # Encrypts containing folder
 
-MASTER_PASSWORD=1234
 STORE_FOLDER=/Users/pi/google-drive/vault/
 TIMESTAMP=201905251430.41
 # NOTE: 
@@ -26,13 +25,15 @@ cp __dec.sh "$STORE_FOLDER"/dec.sh
 parent_dir="${PWD##*/}"
 # NOTE: $PWD == /foo/bar ; ##*/ = remove all till and with last slash, == bar
 
+PASSWORD=$(cat __password.txt)
+
 cd ..
 
-# compress and delete original
+# vault/ -> vault.tar
 tar -c -z -f vault.tar "$parent_dir"/
 rm -r "$parent_dir"
 
-# encrypt and delete compressed
+# vault.tar -> vault.raw
 openssl \
 	enc -aes-256-cbc \
 	-md sha512 \
@@ -41,8 +42,9 @@ openssl \
 	-salt \
 	-in vault.tar \
 	-out vault.raw \
-	-pass pass:"$MASTER_PASSWORD"
+	-pass pass:"$PASSWORD"
 rm -f vault.tar
+unset PASSWORD
 
 mv vault.raw "$STORE_FOLDER"
 

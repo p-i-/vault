@@ -17,4 +17,9 @@ cp   foo.txt /tmp/vault
 chmod a+x /tmp/vault/enc.sh
 chmod a+x /tmp/vault/__dec.sh
 
+echo "Enter password:"
+# raw, silent
+read -r -s password
+echo "$password" > /tmp/vault/__password.txt
+
 /tmp/vault/enc.sh SETUP
