@@ -44,11 +44,12 @@ openssl \
 	-pass pass:"$MASTER_PASSWORD"
 rm -f vault.tar
 
+mv vault.raw "$STORE_FOLDER"
+
 # fudge timestamp:
 # 	https://unix.stackexchange.com/questions/118577/changing-a-files-date-created-and-last-modified-attributes-to-another-file
-touch -m -a -t "$TIMESTAMP" vault.raw
-
-mv vault.raw "$STORE_FOLDER"
+touch -m -a -t "$TIMESTAMP" "$STORE_FOLDER"
+touch -m -a -t "$TIMESTAMP" "$STORE_FOLDER"/vault.raw
 
 # cd "$STORE_FOLDER"
 
