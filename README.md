@@ -14,3 +14,6 @@ SECURITY NOTE:
 TODO:
 - extern STORE_FOLDER  ??
 - env -i HELLO=world bash  ??
+- `st .`
+- `cp vault.raw vault.raw.backup`
+- handle wrong password!

@@ -42,7 +42,12 @@ openssl \
 unset PASSWORD
 rm -f vault.tar
 
-mv vault.raw "$STORE_FOLDER"
+# extra-secure update!
+if [ -f "$STORE_FOLDER"/vault.raw ]; then
+	cp "$STORE_FOLDER"/vault.raw "$STORE_FOLDER"/vault.raw.backup
+fi
+cp vault.raw "$STORE_FOLDER"
+rm vault.raw
 
 # * transfer timestamp (mod'd, acc'd) from enc
 # 	    https://unix.stackexchange.com/questions/118577/changing-a-files-date-created-and-last-modified-attributes-to-another-file
@@ -63,4 +68,5 @@ touch -r "$STORE_FOLDER" "$STORE_FOLDER"/vault.raw
 
 # trap 'cd ..' EXIT
 
-echo Writing to "$STORE_FOLDER"/vault.raw
+echo Encrypting to "$STORE_FOLDER"/vault.raw
+echo Execute "$STORE_FOLDER"/dec to decrypt!
