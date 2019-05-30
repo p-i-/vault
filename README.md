@@ -6,8 +6,11 @@
 
 - `setup.sh`
 
+SECURITY NOTE:
+  Execute sensitive commands with preceding space, e.g.: " dec my_vault.raw"
+    (https://unix.stackexchange.com/questions/10922/temporarily-suspend-bash-history-on-a-given-shell)
+
+
 TODO:
-- TimeStamp set in setup
-- extern STORE_FOLDER
-- /vault/files/foo.txt
-- enc.sh -> enc
+- extern STORE_FOLDER  ??
+- env -i HELLO=world bash  ??
