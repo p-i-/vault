@@ -1,27 +1,27 @@
 #!/bin/bash
 
-# quit on error
-set -e
-
 # switch to folder of script
 cd $(dirname "$0")
 
-TEMP=$(mktemp -d /tmp/vault.XXXXXXXX)
+SRC=$(pwd)
 
+TEMP=$(mktemp -d /tmp/vault.XXXXXXXX)
 rm -r "$TEMP"
 mkdir "$TEMP"
+cd "$TEMP"
 
-cp enc.sh  "$TEMP"/enc
-chmod a+x  "$TEMP"/enc
+cp "$SRC"/enc.sh enc
+chmod a+x enc
 
-cp dec.sh  "$TEMP"/__dec.sh
+cp "$SRC"/dec.sh __dec.sh
 
 # target folder (we offer to save dev-cycle time with ENCRYPTED_FOLDER.txt)
-if [ -f ENCRYPTED_FOLDER.txt ]; then
-	encrypted_folder=$(cat ENCRYPTED_FOLDER.txt)
+if [ -f "$SRC"/ENCRYPTED_FOLDER.txt ]; then
+	cp "$SRC"/ENCRYPTED_FOLDER.txt __encrypted_folder.txt
 else
-	echo "Enter folder for encrypted vault file:"
+	echo "Enter (full path) folder for encrypted vault file:"
 	read -r encrypted_folder
+	echo "$encrypted_folder" > __encrypted_folder.txt
 fi
 
 if [ -d "$encrypted_folder" ]; then
@@ -29,18 +29,16 @@ if [ -d "$encrypted_folder" ]; then
 	exit 1
 fi
 
-echo "$encrypted_folder" > "$TEMP"/__encrypted_folder.txt
-
 # password
 echo "Enter password:"
 read -rs password
-echo "$password" > "$TEMP"/__password.txt
+echo "$password" > __password.txt
 
 # sample secret data
-echo bar > "$TEMP"/foo.txt
+echo bar > foo.txt
 
 echo "Creating initial vault contents:"
-ls -l "$TEMP"
+ls -l
 
 echo "Encrypting..."
-"$TEMP"/enc SETUP
+./enc SETUP

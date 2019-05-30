@@ -23,6 +23,7 @@ chmod a+x "$STORE_FOLDER"/dec
 
 # * vault/ -> vault.tar
 tar -czf ../vault.tar .
+
 # if we are in folder /foo/bar/quux, retrieve "quux":
 #     ##*/ removes all up to and including last slash
 parent_dir="${PWD##*/}"

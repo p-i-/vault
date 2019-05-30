@@ -10,7 +10,7 @@ VAULT_FILE=vault.raw
 # switch to folder of script
 cd $(dirname "$0")
 
-raw_folder="$pwd"
+raw_folder=$(pwd)
 
 # https://superuser.com/questions/1007647/bash-how-to-remove-bp-precmd-invoke-cmd-error/1168690
 # unset PROMPT_COMMAND
@@ -31,8 +31,8 @@ openssl \
 
 if [ $? != 0 ]; then
 	rm -r "$TEMP"
-	echo openssl error (maybe bad password?), aborting!
-	echo Hit ENTER to leave!
+	echo "openssl error (maybe bad password), aborting!"
+	echo "Hit ENTER to leave!"
 	read
 	exit 1
 fi
@@ -44,7 +44,7 @@ rm vault.tar
 
 # update record of where encrypted vault file is stored
 # so that when we we re-encrypt, we can replace the same file 
-cat "$raw_folder" > __encrypted_folder.txt
+echo "$raw_folder" > __encrypted_folder.txt
 
 # # turn off history
 # #   https://unix.stackexchange.com/questions/10922/temporarily-suspend-bash-history-on-a-given-shell
