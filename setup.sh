@@ -16,30 +16,31 @@ chmod a+x  "$TEMP"/enc
 
 cp dec.sh  "$TEMP"/__dec.sh
 
-# sample secret data
-echo bar > "$TEMP"/foo.txt
-
-# to save dev-cycle time...
+# target folder (we offer to save dev-cycle time with ENCRYPTED_FOLDER.txt)
 if [ -f ENCRYPTED_FOLDER.txt ]; then
-	cp ENCRYPTED_FOLDER.txt "$TEMP"/__encrypted_folder.txt
+	encrypted_folder=$(cat ENCRYPTED_FOLDER.txt)
 else
 	echo "Enter folder for encrypted vault file:"
 	read -r encrypted_folder
-	echo "$encrypted_folder" > "$TEMP"/__encrypted_folder.txt
 fi
 
-encrypted_folder=$(cat "$TEMP"/__encrypted_folder.txt)
-if [ -d encrypted_folder ]; then
+if [ -d "$encrypted_folder" ]; then
 	echo "Folder already exists, aborting!"
 	exit 1
 fi
 
+echo "$encrypted_folder" > "$TEMP"/__encrypted_folder.txt
+
+# password
 echo "Enter password:"
-# raw, silent
-read -r -s password
+read -rs password
 echo "$password" > "$TEMP"/__password.txt
+
+# sample secret data
+echo bar > "$TEMP"/foo.txt
 
 echo "Creating initial vault contents:"
 ls -l "$TEMP"
 
+echo "Encrypting..."
 "$TEMP"/enc SETUP
