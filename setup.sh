@@ -1,44 +1,78 @@
 #!/bin/bash
 
-# switch to folder of script
+CURR_FOLDER=$(pwd)
+
+# Store script folder
 cd $(dirname "$0")
+SCRIPT_FOLDER="$(pwd)"
 
-SRC=$(pwd)
-
-TEMP=$(mktemp -d /tmp/vault.XXXXXXXX)
+# * Make TEMP vault-unpacked folder & switch to it
+TEMP=$(mktemp -d /tmp/vault.initial.XXXXXXXX)
 rm -r "$TEMP"
 mkdir "$TEMP"
 cd "$TEMP"
 
-cp "$SRC"/enc.sh enc
+
+# * Copy encryptor into it & make executable
+cp "$SCRIPT_FOLDER"/enc.sh enc
 chmod a+x enc
 
-cp "$SRC"/dec.sh __dec.sh
 
-# target folder (we offer to save dev-cycle time with ENCRYPTED_FOLDER.txt)
-if [ -f "$SRC"/ENCRYPTED_FOLDER.txt ]; then
-	cp "$SRC"/ENCRYPTED_FOLDER.txt __encrypted_folder.txt
-else
-	echo "Enter (full path) folder for encrypted vault file:"
-	read -r encrypted_folder
-	echo "$encrypted_folder" > __encrypted_folder.txt
+# * Copy DEcryptor into it, but __prefix it
+#   __foo in a decrypted vault folder is a "Do Not Meddle" file
+#   We'll have 3:
+#     - __dec.sh
+#     - __encrypted_folder.txt
+#     - __password.txt
+cp "$SCRIPT_FOLDER"/dec.sh __dec.sh
+
+
+# init.sh script
+echo "# Upon decryption, commands here will execute" > init.sh
+echo "open ." >> init.sh
+
+
+# Sample secret data
+mkdir vault
+echo bar > vault/foo.txt
+
+
+# * Path for vault
+echo "Enter vault file:"
+read -r encrypted_filepath
+
+cd "$CURR_FOLDER"
+DIR="$(dirname "$encrypted_filepath")"
+if [ ! -d "$DIR" ]; then
+	echo "Creating folder: $DIR"
+	mkdir -p "$DIR"
 fi
+cd "$DIR"
+RAW_FOLDER="$(pwd)"
+RAW_FILE=$(basename "$encrypted_filepath")
+RAW_FILEPATH="$RAW_FOLDER"/"$RAW_FILE"
 
-if [ -d "$encrypted_folder" ]; then
-	echo "Folder already exists, aborting!"
-	exit 1
-fi
+# return to temp folder
+cd "$TEMP"
+echo "$RAW_FILEPATH" > __encrypted_filepath.txt
 
-# password
+
+# * Password
 echo "Enter password:"
 read -rs password
 echo "$password" > __password.txt
 
-# sample secret data
-echo bar > foo.txt
 
-echo "Creating initial vault contents:"
-ls -l
+# * View TEMP
+echo
+echo "Creating initial vault contents at $(pwd):"
+ls -lR
 
-echo "Encrypting..."
-./enc SETUP
+
+# # * Encrypt (& erase this folder)
+# echo
+# echo Hit ENTER to encrypt
+# read
+
+# echo "Encrypting..."
+enc

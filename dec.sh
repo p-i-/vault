@@ -1,22 +1,36 @@
 #!/bin/bash
 
-VAULT_FILE=vault.raw
+# * Pass in file to decrypt
+if [ -z "$1" ]; then
+	echo "usage:"
+	echo "   dec.sh path/to/my_vault_file"
+	exit 1
+fi
 
-# quit on error
-# TODO: 
-#    http://mywiki.wooledge.org/BashFAQ/105
-# set -e
+RAW_FOLDER="$(cd "$(dirname "$1")"; pwd)"
+RAW_FILE=$(basename "$1")
 
-# switch to folder of script
-cd $(dirname "$0")
+echo $RAW_FOLDER
+echo $RAW_FILE
 
-raw_folder=$(pwd)
+RAW_FILEPATH="$RAW_FOLDER"/"$RAW_FILE"
+if [ ! -f "$RAW_FILEPATH" ]; then
+	echo "File not exists"
+	exit 1
+fi
 
-# https://superuser.com/questions/1007647/bash-how-to-remove-bp-precmd-invoke-cmd-error/1168690
-# unset PROMPT_COMMAND
+
+# NOTE:
+#    We _don't_ quit on error with `set -e` -- see http://mywiki.wooledge.org/BashFAQ/105
+
+# # switch to folder of script
+# cd $(dirname "$0")
+
+# RAW_FOLDER=$(pwd)
 
 TEMP=$(mktemp -d /tmp/vault.XXXXXXXX)
 mkdir -p "$TEMP"
+cd "$TEMP"
 
 # decrypt to /tmp/vault.tar
 openssl \
@@ -26,13 +40,13 @@ openssl \
 	-pbkdf2 \
 	-iter 1000 \
 	-salt \
-	-in "$VAULT_FILE" \
+	-in "$RAW_FILEPATH" \
 	-out "$TEMP"/vault.tar
 
 if [ $? != 0 ]; then
 	rm -r "$TEMP"
 	echo "openssl error (maybe bad password), aborting!"
-	echo "Hit ENTER to leave!"
+	echo "Hit ENTER to quit!"
 	read
 	exit 1
 fi
@@ -44,7 +58,7 @@ rm vault.tar
 
 # update record of where encrypted vault file is stored
 # so that when we we re-encrypt, we can replace the same file 
-echo "$raw_folder" > __encrypted_folder.txt
+echo "$RAW_FILEPATH" > __encrypted_filepath.txt
 
 # # turn off history
 # #   https://unix.stackexchange.com/questions/10922/temporarily-suspend-bash-history-on-a-given-shell
@@ -64,4 +78,4 @@ echo "$raw_folder" > __encrypted_folder.txt
 
 echo Unpacked to: "$TEMP"
 
-open "$TEMP"
+source init.sh

@@ -9,7 +9,11 @@ set -e
 cd $(dirname "$0")
 
 PASSWORD=$(cat __password.txt)
-STORE_FOLDER=$(cat __encrypted_folder.txt)
+
+STORE_FILEPATH=$(cat __encrypted_filepath.txt)
+
+STORE_FOLDER=$(dirname "$STORE_FILEPATH")
+STORE_FILE=$(basename "$STORE_FILEPATH")
 
 # * force-create if not exist
 mkdir -p "$STORE_FOLDER"
@@ -24,11 +28,11 @@ chmod a+x "$STORE_FOLDER"/dec
 # * vault/ -> vault.tar
 tar -czf ../vault.tar .
 
-# if we are in folder /foo/bar/quux, retrieve "quux":
-#     ##*/ removes all up to and including last slash
+# * `cd ..`
+#      (to retrieve immediate containing folder-name, e.g. /foo/bar/quux -> "quux",
+#         do ##*/ which removes all up to and including last slash)
 parent_dir="${PWD##*/}"
 cd ..
-rm -r "$parent_dir"
 
 # * vault.tar -> vault.raw
 openssl \
@@ -43,21 +47,26 @@ openssl \
 unset PASSWORD
 rm -f vault.tar
 
-# extra-secure update!
-if [ -f "$STORE_FOLDER"/vault.raw ]; then
-	cp "$STORE_FOLDER"/vault.raw "$STORE_FOLDER"/vault.raw.backup
+# * (securely copy) vault.raw -> "$STORE_FOLDER"/vault.raw
+if [ -f "$STORE_FILEPATH" ]; then
+	echo "Backing up original to ${STORE_FILEPATH}.backup"
+	cp "$STORE_FILEPATH" "$STORE_FILEPATH".backup
 fi
-cp vault.raw "$STORE_FOLDER"
+cp vault.raw "$STORE_FILEPATH"
 rm vault.raw
+rm -f "$STORE_FILEPATH".backup
 
 # * transfer timestamp (mod'd, acc'd) from enc
 # 	    https://unix.stackexchange.com/questions/118577/changing-a-files-date-created-and-last-modified-attributes-to-another-file
-touch -r "$STORE_FOLDER" "$STORE_FOLDER"/vault.raw
-# touch -m -a -t "$TIMESTAMP" "$STORE_FOLDER"
-# touch -m -a -t "$TIMESTAMP" "$STORE_FOLDER"/vault.raw
+touch -r "$parent_dir"/enc "$STORE_FILEPATH"
 
-# cd "$STORE_FOLDER"
+rm -r "$parent_dir"
 
+echo "Encrypting to $STORE_FILEPATH"
+echo
+
+# - - - - - - - 
+# DEAD/OLD:
 # # * turn history back on
 # #       https://unix.stackexchange.com/questions/10922/temporarily-suspend-bash-history-on-a-given-shell	
 # set -o history
@@ -68,6 +77,3 @@ touch -r "$STORE_FOLDER" "$STORE_FOLDER"/vault.raw
 # fi
 
 # trap 'cd ..' EXIT
-
-echo Encrypting to "$STORE_FOLDER"/vault.raw
-echo Execute "$STORE_FOLDER"/dec to decrypt!
