@@ -71,17 +71,3 @@ echo "$password" > "$TEMP"/__password.txt
 # * View TEMP
 echo
 echo "Created initial vault contents at $TEMP"
-ls -lR "$TEMP"
-
-
-# # * Encrypt (& erase this folder)
-# echo
-# echo Hit ENTER to encrypt
-# read
-
-echo
-read -rsn 1 -p "Press any key to encrypt..." < /dev/tty  # https://mywiki.wooledge.org/BashFAQ/065
-echo
-
-# echo "Encrypting..."
-"$TEMP"/encrypt
