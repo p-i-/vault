@@ -1,8 +1,5 @@
 #!/bin/bash
 
-# * quit on error, print each command
-set -ex
-
 # * Pass in file to decrypt
 if [ -z "$1" ]; then
 	echo "usage:"
@@ -22,18 +19,8 @@ if [ ! -f "$RAW_FILEPATH" ]; then
 	exit 1
 fi
 
-
-# NOTE:
-#    We _don't_ quit on error with `set -e` -- see http://mywiki.wooledge.org/BashFAQ/105
-
-# # switch to folder of script
-# cd $(dirname "$0")
-
-# RAW_FOLDER=$(pwd)
-
 TEMP=$(mktemp -d /tmp/vault.XXXXXXXX)
 mkdir -p "$TEMP"
-# cd "$TEMP"
 
 # decrypt to /tmp/vault.tar
 openssl \
@@ -62,22 +49,6 @@ rm vault.tar
 # update record of where encrypted vault file is stored
 # so that when we we re-encrypt, we can replace the same file 
 echo "$RAW_FILEPATH" > __encrypted_filepath.txt
-
-# # turn off history
-# #   https://unix.stackexchange.com/questions/10922/temporarily-suspend-bash-history-on-a-given-shell
-# set +o history
-
-# rm -fr /tmp/vault/
-# rm -f vault.enc
-# rm -- "$0"				# rm this file
-
-# leaves X/
-
-# # Start an interactive shell in the directory with
-# # HISTFILE set to /dev/null
-# ( cd "vault" && HISTFILE=/dev/null bash )
-
-# trap 'cd "$TEMP"' EXIT
 
 echo Unpacked to: "$TEMP"
 
