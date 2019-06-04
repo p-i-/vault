@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# * quit on error, print each command
+set -ex
+
 # * Pass in file to decrypt
 if [ -z "$1" ]; then
 	echo "usage:"
@@ -30,7 +33,7 @@ fi
 
 TEMP=$(mktemp -d /tmp/vault.XXXXXXXX)
 mkdir -p "$TEMP"
-cd "$TEMP"
+# cd "$TEMP"
 
 # decrypt to /tmp/vault.tar
 openssl \
@@ -78,4 +81,4 @@ echo "$RAW_FILEPATH" > __encrypted_filepath.txt
 
 echo Unpacked to: "$TEMP"
 
-source init.sh
+source "$TEMP"/init.sh
