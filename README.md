@@ -100,3 +100,11 @@ Rinse and repeat!
 
 _**TIP:** Execute sensitive commands with preceding space, e.g.: ` decrypt my.vault` & they won't get stored in `~/.bash_history`_
     ([ref.](https://unix.stackexchange.com/questions/10922/temporarily-suspend-bash-history-on-a-given-shell))
+
+
+# NOTES
+
+## macOS
+
+This works with `OpenSSL 1.1.1b  26 Feb 2019` installed at `/usr/local/anaconda3/bin/openssl`
+It DOESN'T work with the `openssl` that ships with macOS
