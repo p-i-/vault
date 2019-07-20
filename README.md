@@ -107,4 +107,7 @@ _**TIP:** Execute sensitive commands with preceding space, e.g.: ` decrypt my.va
 ## macOS
 
 This works with `OpenSSL 1.1.1b  26 Feb 2019` installed at `/usr/local/anaconda3/bin/openssl`
-It DOESN'T work with the `openssl` that ships with macOS
+
+This binary is included in `OpenSSL-1.1.1b_macOS/` -- if you wish to use this binary, you will have to make sure that your shell finds it BEFORE it finds the system `openssh`. So examine your `$PATH` and copy it somewhere appropriate.
+
+This project DOESN'T work with the `openssl` that ships with macOS (which is LibreSSL)
