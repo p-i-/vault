@@ -29,12 +29,15 @@ tar -czf ../vault.tar .
 openssl \
 	enc -aes-256-cbc \
 	-md sha512 \
-	-pbkdf2 \
-	-iter 1000 \
 	-salt \
 	-in  "$SCRIPT_FOLDER"/../vault.tar \
 	-out "$SCRIPT_FOLDER"/../vault.raw \
 	-pass pass:"$PASSWORD"
+
+# ^ Removed 2 options to make compatible with "LibreSSL 2.6.5" which ships with macOS:
+#   -pbkdf2
+#   -iter 1000
+
 unset PASSWORD
 rm -f "$SCRIPT_FOLDER"/../vault.tar
 

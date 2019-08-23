@@ -27,11 +27,13 @@ openssl \
 	enc -aes-256-cbc \
 	-d \
 	-md sha512 \
-	-pbkdf2 \
-	-iter 1000 \
 	-salt \
 	-in "$RAW_FILEPATH" \
 	-out "$TEMP"/vault.tar
+
+# ^ Removed 2 options to make compatible with "LibreSSL 2.6.5" which ships with macOS:
+#   -pbkdf2
+#   -iter 1000
 
 if [ $? != 0 ]; then
 	rm -r "$TEMP"
